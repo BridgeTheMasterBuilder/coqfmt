@@ -440,6 +440,10 @@ let is_tactic = function
       true
   | _ -> false
 
+let is_admitted = function
+  | Vernacexpr.VernacEndProof Admitted -> true
+  | _ -> false
+
 let pp_ltac =
   map_sequence (fun arg ->
       match raw_tactic_expr_of_raw_generic_argument arg with
@@ -642,8 +646,8 @@ let separator current next =
   let open Vernacexpr in
   let open CAst in
   match (current.v.expr, next.v.expr) with
-  | (VernacStartTheoremProof _, tactic | VernacDefinition _, tactic)
-    when is_tactic tactic ->
+  | (VernacStartTheoremProof _, next | VernacDefinition _, next)
+    when is_tactic next || is_admitted next ->
       sequence [ newline; increase_indent ]
   | _, VernacProof _
   | VernacCheckMayEval _, VernacCheckMayEval _
